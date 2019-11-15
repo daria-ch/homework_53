@@ -1,26 +1,57 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
+import nanoid from 'nanoid';
+import AddTaskForm from "./components/AddTaskForm/AddTaskForm";
+import Task from "./components/Task/Task";
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+    state = {
+        currentTask: {text: '', id: ''},
+        tasks: [
+            {text: 'Buy bread', id: nanoid()},
+            {text: 'Clean room', id: nanoid()},
+        ]
+    };
+
+    enterText = event => {
+        this.setState({currentTask: {text: event.target.value, id: nanoid()}});
+    };
+
+    addTask = () => {
+        const tasks = [...this.state.tasks];
+        tasks.push(this.state.currentTask);
+        this.setState({tasks});
+    };
+
+    removeTask = id => {
+        const index = this.state.tasks.findIndex(p => p.id === id);
+        const tasks = [...this.state.tasks];
+        tasks.splice(index, 1);
+        this.setState({tasks});
+    };
+
+    render() {
+        const tasks = this.state.tasks.map(task => {
+            return <Task
+                text={task.text}
+                remove={() => this.removeTask(task.id)}
+            >
+                <i className="far fa-trash-alt"></i>
+            </Task>
+        });
+
+        return (
+            <div className="App">
+                <AddTaskForm
+                    enter={this.enterText}
+                    add={this.addTask}>
+                </AddTaskForm>
+                <div>
+                    {tasks}
+                </div>
+            </div>
+        )
+    }
 }
 
 export default App;
